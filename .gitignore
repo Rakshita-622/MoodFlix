@@ -1,0 +1,36 @@
+# 🚀 Frontend Node Modules
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+.DS_Store
+
+# 🐍 Backend Python Environments
+backend/venv/
+backend/.venv/
+backend/env/
+backend/__pycache__/
+backend/**/*.pyc
+backend/**/*.pyo
+backend/**/*.pyd
+
+# 🔑 Secrets & Configuration
+backend/.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+npm-debug.log*
+
+# 🧠 Machine Learning Artifacts & Heavy Data
+backend/data/*.csv
+backend/data/*.pkl
+backend/data/*.h5
+backend/data/*.npy
+
+# 💻 IDE & OS Files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
