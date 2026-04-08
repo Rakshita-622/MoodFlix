@@ -9,6 +9,11 @@ import pickle
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.metrics import classification_report, accuracy_score
+from sklearn.model_selection import train_test_split
+import numpy as np
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 CSV_PATH = os.environ.get("DATA_PATH", os.path.join(DATA_DIR, "tmdb_5000_movies.csv"))
@@ -54,6 +59,46 @@ def train() -> None:
     # Compute cosine similarity
     print("Computing cosine similarity matrix...")
     similarity = cosine_similarity(tfidf_matrix, tfidf_matrix)
+
+    # ---------------------------------------------------------
+    # Hit / Flop Classifier (Decision Tree)
+    # ---------------------------------------------------------
+    print("Training Hit/Flop Decision Tree Classifier...")
+    clf_df = df[(df['revenue'] > 0) & (df['runtime'] > 0)].copy()
+    median_revenue = clf_df['revenue'].median()
+    clf_df['is_hit'] = (clf_df['revenue'] > median_revenue).astype(int)
+
+    mlb = MultiLabelBinarizer()
+    genre_matrix = mlb.fit_transform(clf_df['genres_parsed'].apply(lambda x: x.split()))
+    
+    X = clf_df[['runtime', 'vote_average', 'vote_count']].copy()
+    for i, cls in enumerate(mlb.classes_):
+        X[cls] = genre_matrix[:, i]
+        
+    y = clf_df['is_hit'].values
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    dt = DecisionTreeClassifier(max_depth=5, random_state=42)
+    dt.fit(X_train, y_train)
+
+    y_pred = dt.predict(X_test)
+    print(f"Classification Accuracy: {accuracy_score(y_test, y_pred):.4f}")
+    print("Classification Report:\n", classification_report(y_test, y_pred, target_names=["Flop", "Hit"]))
+
+    # Predict over ALL movies
+    df_pred = df.copy()
+    df_pred['runtime'] = df_pred['runtime'].replace(0, clf_df['runtime'].median()).fillna(clf_df['runtime'].median())
+    df_pred['vote_average'] = df_pred['vote_average'].fillna(clf_df['vote_average'].median())
+    df_pred['vote_count'] = df_pred['vote_count'].fillna(clf_df['vote_count'].median())
+    
+    genre_matrix_all = mlb.transform(df_pred['genres_parsed'].apply(lambda x: x.split()))
+    X_all = df_pred[['runtime', 'vote_average', 'vote_count']].copy()
+    for i, cls in enumerate(mlb.classes_):
+        X_all[cls] = genre_matrix_all[:, i]
+        
+    y_all_pred = dt.predict(X_all)
+    df['hit_flop_label'] = np.where(y_all_pred == 1, "Hit", "Flop")
+    print(f"Assigned Hit/Flop Labels manually to all {len(df)} records.\n")
 
     # Save artifacts
     os.makedirs(DATA_DIR, exist_ok=True)

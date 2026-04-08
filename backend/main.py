@@ -105,6 +105,7 @@ class MovieResult(BaseModel):
     overview: str
     similarity_score: float
     poster_url: str
+    hit_flop_label: str = "Unknown"
 
 
 def _genre_color(genres: str) -> str:

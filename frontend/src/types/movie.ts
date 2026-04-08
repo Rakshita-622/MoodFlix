@@ -5,6 +5,7 @@ export interface MovieResult {
   overview: string;
   similarity_score: number;
   poster_url: string;
+  hit_flop_label?: string;
 }
 
 export interface MoodRecommendationResponse {
@@ -32,4 +33,5 @@ export interface MasonryItem {
   genres?: string;
   overview?: string;
   similarity_score?: number;
+  hit_flop_label?: string;
 }

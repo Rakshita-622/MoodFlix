@@ -85,6 +85,7 @@ class MovieRecommender:
                 "genres": row.get("genres_parsed", ""),
                 "overview": str(row.get("overview", "")),
                 "similarity_score": round(norm_score, 4),
+                "hit_flop_label": str(row.get("hit_flop_label", "Unknown")),
             })
         return results
 
@@ -130,6 +131,7 @@ class MovieRecommender:
                 "genres": row.get("genres_parsed", ""),
                 "overview": str(row.get("overview", "")),
                 "similarity_score": round(float(score / max_score), 4),
+                "hit_flop_label": str(row.get("hit_flop_label", "Unknown")),
             })
         return genre, results
 

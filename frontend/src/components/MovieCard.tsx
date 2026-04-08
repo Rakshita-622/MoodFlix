@@ -6,6 +6,7 @@ interface MovieCardProps {
   overview: string;
   similarity_score: number;
   poster_url: string;
+  hit_flop_label?: string;
   height: number;
 }
 
@@ -40,6 +41,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
   overview,
   similarity_score,
   poster_url,
+  hit_flop_label,
   height,
 }) => {
   const matchPercent = (similarity_score * 100).toFixed(0);
@@ -67,6 +69,19 @@ const MovieCard: React.FC<MovieCardProps> = ({
         className="w-full h-full object-cover"
         loading="lazy"
       />
+
+      {hit_flop_label && hit_flop_label !== "Unknown" && (
+        <div 
+          className={`absolute top-2 left-2 px-2 py-0.5 border-2 border-black font-black text-xs z-10`}
+          style={{ 
+            backgroundColor: hit_flop_label === "Hit" ? "#4ade80" : "#f87171",
+            color: "#000",
+            boxShadow: "2px 2px 0px #000"
+          }}
+        >
+          {hit_flop_label.toUpperCase()}
+        </div>
+      )}
 
       {/* Always-visible bottom overlay */}
       <div

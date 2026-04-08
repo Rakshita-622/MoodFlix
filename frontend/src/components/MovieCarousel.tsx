@@ -58,6 +58,7 @@ const MovieCarousel: React.FC<MovieCarouselProps> = ({ movies, title }) => {
                   overview={movie.overview}
                   similarity_score={movie.similarity_score}
                   poster_url={movie.poster_url || ""}
+                  hit_flop_label={movie.hit_flop_label}
                   height={360}
                 />
               </div>

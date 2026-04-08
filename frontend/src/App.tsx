@@ -2,6 +2,7 @@ import React from 'react';
 import Navbar from './components/Navbar';
 import MoodSelector from './components/MoodSelector';
 import SearchBar from './components/SearchBar';
+import AnalyticsDashboard from './components/AnalyticsDashboard';
 
 /* ─── Hero Section ─── */
 const HeroSection: React.FC = () => (
@@ -263,6 +264,7 @@ const App: React.FC = () => (
     <Navbar />
     <HeroSection />
     <MarqueeBanner />
+    <AnalyticsDashboard />
     <MoodSelector />
     <HowItWorks />
     <SearchBar />
