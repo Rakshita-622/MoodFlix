@@ -1,97 +1,66 @@
-# ⚡ MoodFlix — Mood-Based Movie Recommendation System
+# ⚡ MoodFlix
 
-> A full-stack, ML-powered movie recommendation web app that matches your mood to movies using TF-IDF vectorization and cosine similarity, trained on the TMDB 5000 dataset.
+**A Full-Stack ML-Powered Mood-Based Movie Recommendation Engine**
 
-![Neo-Brutalist Design](https://via.placeholder.com/800x400/ffe17c/000000?text=MoodFlix)
+![MoodFlix Preview](frontend/public/analytics/1_genres.png)
 
----
-
-## 🎯 Project Description
-
-**MoodFlix** uses Natural Language Processing (NLP) techniques to recommend movies based on either:
-
-1. **Your mood** — maps mood → genre → ranks by aggregate similarity
-2. **A movie title** — finds the 5 most similar movies using cosine similarity
-
-### ML Method
-
-- **TF-IDF Vectorizer** (scikit-learn) — converts movie overviews + genres into numerical feature vectors
-- **Cosine Similarity** — computes pairwise similarity across all 5,000 movies
-- **Mood-Genre Mapping** — 9 moods mapped to genres, ranked by centrality within genre clusters
+MoodFlix is a production-grade Web Application built to solve the "paradox of choice" on streaming platforms. Instead of making you blindly endlessly scroll through titles, MoodFlix allows you to select your **current mood** (e.g., Happy, Sad, Nostalgic), and utilizes purely mathematical Machine Learning models to instantly recommend the perfect movie.
 
 ---
 
-## 🏗️ Architecture
+## 🧠 Machine Learning Architecture
 
-```
-┌─────────────────────────────────────────────────┐
-│                  Browser (React)                │
-│  ┌──────────┐  ┌───────────┐  ┌──────────────┐ │
-│  │MoodSelect│  │ SearchBar │  │MasonryGallery│ │
-│  └────┬─────┘  └─────┬─────┘  └──────────────┘ │
-│       │               │                         │
-│       └───────┬───────┘                         │
-│               │ HTTP (fetch)                    │
-├───────────────┼─────────────────────────────────┤
-│               ▼                                 │
-│         FastAPI (Python)                        │
-│  ┌─────────────────────────┐                    │
-│  │ /api/recommend/mood     │                    │
-│  │ /api/recommend/title    │                    │
-│  │ /api/movies/search      │                    │
-│  └──────────┬──────────────┘                    │
-│             │                                   │
-│  ┌──────────▼──────────────┐                    │
-│  │ Predictor               │                    │
-│  │ ├─ movies.pkl (DataFrame)│                   │
-│  │ └─ similarity.pkl (matrix)│                  │
-│  └─────────────────────────┘                    │
-└─────────────────────────────────────────────────┘
-```
+MoodFlix employs two parallel Machine Learning models operating on the **TMDB 5000 Movies Dataset**:
+
+### 1. The Core Engine: Unsupervised NLP (TF-IDF & Cosine Similarity)
+Instead of relying on simple genre sorts, MoodFlix vectorizes the raw text of 4,800 movie plotlines (`overviews`) and genres. By applying a **TF-IDF** (Term Frequency-Inverse Document Frequency) algorithm, it compresses the English language into an algebraic matrix. It then plots these movies in a 20,000-dimensional matrix, using **Cosine Similarity** density clustering to find the movies with the narrowest geometric angle (meaning their plots and themes are statistically identical). 
+
+### 2. The Evaluator: Supervised Decision Tree Classifier
+Every movie returned by the recommendation engine is instantly piped through a Supervised **Decision Tree Classifier** restricted to a `max_depth` of 5. Natively trained on runtime, rating averages, and `MultiLabelBinarized` genre arrays, this algorithm predicts whether the movie was a Box Office **Hit** (1) or **Flop** (0) based strictly on the mathematical median of the dataset, rendering a bright neon badge directly onto the React User Interface.
 
 ---
 
-## 🚀 Setup
+## 🏗️ Tech Stack
 
-### Prerequisites
+### Backend (Computation Layer)
+- **Framework:** FastAPI / Uvicorn (Python 3.10+)
+- **ML Libraries:** Scikit-Learn, Pandas, NumPy
+- **Data Visualization:** Matplotlib, Seaborn
+- **Integration:** TMDB API (httpx)
 
-- **Python 3.11+**
-- **Node.js 18+**
-- **Docker** + **Docker Compose** (optional, for containerized deployment)
+### Frontend (Client Layer)
+- **Framework:** React 18, Vite, TypeScript
+- **Styling:** TailwindCSS (Neo-Brutalist styling tokens)
+- **Animations:** GSAP (GreenSock)
 
-### Dataset
+---
 
-1. Download `tmdb_5000_movies.csv` from [Kaggle TMDB Dataset](https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata)
-2. Place it in `backend/data/tmdb_5000_movies.csv`
+## 🚀 Local Installation
 
-### Local Development (without Docker)
+This project is built as a split-stack. To run it locally on your machine, you must run both the backend API and the frontend website simultaneously.
 
+### 1. Start the Backend API
+Open a terminal in the `backend/` directory:
 ```bash
-# 1. Backend
 cd backend
-python -m venv venv && source venv/bin/activate
+python -m venv venv
+venv\Scripts\activate   # (Windows)
 pip install -r requirements.txt
-python model/train.py          # Train the model
-uvicorn main:app --reload      # Start API at localhost:8000
+python -m uvicorn main:app --reload
+```
 
-# 2. Frontend (new terminal)
+### 2. Start the Frontend Website
+Open a second terminal in the `frontend/` directory:
+```bash
 cd frontend
 npm install
-npm run dev                    # Start at localhost:5173
+npm run dev
 ```
-
-### Docker Compose (recommended)
-
-```bash
-# Place tmdb_5000_movies.csv in backend/data/ first
-docker-compose up --build
-# Backend: http://localhost:8000
-# Frontend: http://localhost:5173
-```
+Navigate to `http://localhost:5173` in your browser.
 
 ---
 
-## 📡 API Endpoints
+## API Endpoints
 
 | Method | Endpoint               | Body / Params                      | Response                                    |
 |--------|------------------------|------------------------------------|---------------------------------------------|
@@ -101,55 +70,23 @@ docker-compose up --build
 | POST   | `/api/recommend/title` | `{ "title": "Avatar" }`           | `{ query, movies: MovieResult[] }`          |
 | GET    | `/api/movies/search`   | `?q=avatar&limit=10`              | `{ results: [{ title, id }] }`             |
 
-### MovieResult Schema
+---
 
-```json
-{
-  "id": 19995,
-  "title": "Avatar",
-  "genres": "Action Adventure Fantasy",
-  "overview": "In the 22nd century...",
-  "similarity_score": 0.8234,
-  "poster_url": "https://via.placeholder.com/..."
-}
-```
+## 📊 Analytics & Visualizations
+Instead of using disconnected Jupyter Notebooks, MoodFlix dynamically generates raw Pandas visualizations (Density Histograms, Clustered Heatmaps, TF-IDF Term Weights) and embeds them natively into the `"Behind the ML Engine"` gallery on the live website to physically prove the accuracy of its mathematical scaling schemas.
 
 ---
 
-## 📚 ML Context
+## ML Context & Extending the Model
 
 This project extends the coursework from **CSE3231 — Machine Learning Lab** at **Manipal University Jaipur**:
-
 - **CO4 (Regression/Similarity Models)** — Uses cosine similarity as a distance metric to rank movie relevance
 - **CO5 (NLP)** — Applies TF-IDF vectorization to transform text (overviews + genres) into numerical representations
-- The core recommendation logic is adapted from the `movie_rec_system.py` lab notebook
-
----
-
-## 🔮 Extending the Model
 
 Ideas for future improvement:
-
 1. **BERT Embeddings** — Replace TF-IDF with sentence-transformers for semantic understanding
 2. **Collaborative Filtering** — Add user-user or item-item collaborative filtering using rating data
-3. **TMDB API Integration** — Fetch real poster images and metadata via the TMDB API
-4. **Hybrid Model** — Combine content-based (TF-IDF) with collaborative filtering
-5. **User Feedback Loop** — Let users rate recommendations to fine-tune results
+3. **User Feedback Loop** — Let users rate recommendations to fine-tune results
 
 ---
-
-## 🛠️ Tech Stack
-
-| Layer      | Technology                                          |
-|------------|-----------------------------------------------------|
-| Frontend   | React 18 + TypeScript + Vite + Tailwind CSS + GSAP |
-| Backend    | Python 3.11 + FastAPI + Uvicorn                     |
-| ML         | scikit-learn (TfidfVectorizer, cosine_similarity)   |
-| Data       | pandas + pickle                                     |
-| Deployment | Docker + Docker Compose                             |
-
----
-
-## 📄 License
-
-MIT — Built for educational purposes as part of CSE3231 ML Lab.
+*Developed for CSE3231 Machine Learning Laboratory (2025-2026).*
