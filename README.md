@@ -60,18 +60,6 @@ Navigate to `http://localhost:5173` in your browser.
 
 ---
 
-## API Endpoints
-
-| Method | Endpoint               | Body / Params                      | Response                                    |
-|--------|------------------------|------------------------------------|---------------------------------------------|
-| GET    | `/health`              | —                                  | `{ status, movies_loaded }`                 |
-| GET    | `/api/moods`           | —                                  | `{ moods: string[] }`                       |
-| POST   | `/api/recommend/mood`  | `{ "mood": "happy" }`             | `{ mood, genre, movies: MovieResult[] }`    |
-| POST   | `/api/recommend/title` | `{ "title": "Avatar" }`           | `{ query, movies: MovieResult[] }`          |
-| GET    | `/api/movies/search`   | `?q=avatar&limit=10`              | `{ results: [{ title, id }] }`             |
-
----
-
 ## 📊 Analytics & Visualizations
 Instead of using disconnected Jupyter Notebooks, MoodFlix dynamically generates raw Pandas visualizations (Density Histograms, Clustered Heatmaps, TF-IDF Term Weights) and embeds them natively into the `"Behind the ML Engine"` gallery on the live website to physically prove the accuracy of its mathematical scaling schemas.
 
